@@ -29,19 +29,11 @@
     export default {
         name: 'Home',
         data() {
-            return {
-                meetups: [
-                    {
-                        imageUrl: 'https://i.ytimg.com/vi/MtCMtC50gwY/maxresdefault.jpg',
-                        id: '0001',
-                        title: 'New York Meetup'
-                    },
-                    {
-                        imageUrl: 'https://i.ytimg.com/vi/_FYKIhJZdaI/maxresdefault.jpg',
-                        id: '0002',
-                        title: 'Paris Meetup'
-                    }
-                ]
+            return {}
+        },
+        computed: {
+            meetups() {
+                return this.$store.getters.featuredMeetups
             }
         },
         methods: {
