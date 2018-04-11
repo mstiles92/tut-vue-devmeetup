@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import * as moment from 'moment'
 
 Vue.use(Vuex)
 
@@ -9,13 +10,17 @@ const state = {
             imageUrl: 'https://i.ytimg.com/vi/MtCMtC50gwY/maxresdefault.jpg',
             id: '0001',
             title: 'New York Meetup',
-            date: '2017-07-17'
+            date: moment('2017-07-17'),
+            location: 'New York',
+            description: 'New York, New York'
         },
         {
             imageUrl: 'https://i.ytimg.com/vi/_FYKIhJZdaI/maxresdefault.jpg',
             id: '0002',
             title: 'Paris Meetup',
-            date: '2017-07-19'
+            date: moment('2017-07-19'),
+            location: 'Paris',
+            description: 'Paris!'
         }
     ],
     user: {

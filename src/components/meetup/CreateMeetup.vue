@@ -35,7 +35,23 @@
                     </v-layout>
                     <v-layout row>
                         <v-flex xs12 sm6 offset-sm3>
+                            <h4>Choose a Date & Time</h4>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row class="mb-2">
+                        <v-flex xs12 sm6 offset-sm3>
+                            <v-date-picker v-model="date"></v-date-picker>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex xs12 sm6 offset-sm3>
+                            <v-time-picker v-model="time"></v-time-picker>
+                        </v-flex>
+                    </v-layout>
+                    <v-layout row>
+                        <v-flex xs12 sm6 offset-sm3>
                             <v-btn type="submit" class="primary" :disabled="!formIsValid">Create Meetup</v-btn>
+                            {{ submittableDateTime }}
                         </v-flex>
                     </v-layout>
                 </form>
@@ -45,18 +61,25 @@
 </template>
 
 <script>
+    import * as moment from 'moment'
+
     export default {
         data() {
             return {
                 title: '',
                 location: '',
                 imageUrl: '',
-                description: ''
+                description: '',
+                date: null,
+                time: null
             }
         },
         computed: {
             formIsValid() {
                 return this.title !== '' && this.location !== '' && this.imageUrl !== '' && this.description !== ''
+            },
+            submittableDateTime() {
+                return moment(this.date + ' ' + this.time, 'YYYY-MM-DD HH:mm')
             }
         },
         methods: {
@@ -70,7 +93,7 @@
                     location: this.location,
                     imageUrl: this.imageUrl,
                     description: this.description,
-                    date: new Date()
+                    date: this.submittableDateTime
                 }
 
                 this.$store.dispatch('createMeetup', meetupData)
