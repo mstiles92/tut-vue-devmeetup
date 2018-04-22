@@ -6,7 +6,7 @@
                     <v-card-title><h1 class="primary--text">{{ meetup.title }}</h1></v-card-title>
                     <v-card-media :src="meetup.imageUrl" height="400px"></v-card-media>
                     <v-card-text>
-                        <div class="info--text">{{ meetup.date }} - {{ meetup.location }}</div>
+                        <div class="info--text">{{ meetup.date | date }} - {{ meetup.location }}</div>
                         <div>{{ meetup.description }}</div>
                     </v-card-text>
                     <v-card-actions>
