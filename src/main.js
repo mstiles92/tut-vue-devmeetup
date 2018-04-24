@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import App from './App'
-import * as firebase from 'firebase'
 import router from './router'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import colors from 'vuetify/es5/util/colors'
 import { store } from './store'
 import DateFilter from './filters/date'
-import * as firebaseConfig from './config'
+
+// Make firebase accessible from devtools console
+import * as firebase from 'firebase'
+window.firebase = firebase
 
 Vue.use(Vuetify, {
     theme: {
@@ -26,8 +28,5 @@ new Vue({
     el: '#app',
     router,
     store,
-    render: h => h(App),
-    created() {
-        firebase.initializeApp(firebaseConfig)
-    }
+    render: h => h(App)
 })
