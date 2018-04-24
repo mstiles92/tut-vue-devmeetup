@@ -28,7 +28,9 @@ const state = {
     user: {
         id: 'aaaa',
         registeredMeetups: ['0001']
-    }
+    },
+    loading: false,
+    error: null
 }
 
 const mutations = {
@@ -37,6 +39,15 @@ const mutations = {
     },
     setUser(state, payload) {
         state.user = payload
+    },
+    setLoading(state, payload) {
+        state.loading = payload
+    },
+    setError(state, payload) {
+        state.error = payload
+    },
+    clearError(state) {
+        state.error = null
     }
 }
 
@@ -56,16 +67,33 @@ const actions = {
         commit('createMeetup', meetup)
     },
     signUserUp({commit}, payload) {
+        commit('setLoading', true)
+        commit('clearError')
         firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+            .then(() => {
+                commit('setLoading', false)
+            })
             .catch(error => {
+                commit('setLoading', false)
+                commit('setError', error)
                 console.log(error)
             })
     },
     signUserIn({commit}, payload) {
+        commit('setLoading', true)
+        commit('clearError')
         firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
+            .then(() => {
+                commit('setLoading', false)
+            })
             .catch(error => {
+                commit('setLoading', false)
+                commit('setError', error)
                 console.log(error)
             })
+    },
+    clearError({commit}) {
+        commit('clearError')
     }
 }
 
@@ -87,6 +115,12 @@ const getters = {
     },
     user(state) {
         return state.user
+    },
+    loading(state) {
+        return state.loading
+    },
+    error(state) {
+        return state.error
     }
 }
 
