@@ -34,6 +34,9 @@ const state = {
 }
 
 const mutations = {
+    setLoadedMeetups(state, payload) {
+        state.loadedMeetups = payload
+    },
     createMeetup(state, payload) {
         state.loadedMeetups.push(payload)
     },
@@ -52,19 +55,49 @@ const mutations = {
 }
 
 const actions = {
+    loadMeetups({commit}) {
+        commit('setLoading', true)
+        firebase.database().ref('meetups').once('value')
+            .then(data => {
+                const meetups = []
+                const obj = data.val()
+                for (let key in obj) {
+                    meetups.push({
+                        id: key,
+                        title: obj[key].title,
+                        description: obj[key].description,
+                        imageUrl: obj[key].imageUrl,
+                        date: obj[key].date
+                    })
+                }
+                commit('setLoadedMeetups', meetups)
+                commit('setLoading', false)
+            })
+            .catch(error => {
+                console.log(error)
+                commit('setLoading', false)
+            })
+    },
     createMeetup({commit}, payload) {
         const meetup = {
             title: payload.title,
             location: payload.location,
             imageUrl: payload.imageUrl,
             description: payload.description,
-            date: payload.date,
-            id: new Date().valueOf().toString()
+            date: payload.date.toISOString()
         }
 
-        // TODO: Reach out to firebase and store it
-
-        commit('createMeetup', meetup)
+        firebase.database().ref('meetups').push(meetup)
+            .then(data => {
+                const key = data.key
+                commit('createMeetup', {
+                    ...meetup,
+                    id: key
+                })
+            })
+            .catch(error => {
+                console.log(error)
+            })
     },
     signUserUp({commit}, payload) {
         commit('setLoading', true)
