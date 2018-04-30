@@ -102,13 +102,16 @@ const actions = {
                 return firebase.storage().ref(`meetups/${key}.${ext}`).put(payload.image)
             })
             .then(fileData => {
-                imageUrl = fileData.metadata.downloadURLs[0]
-                return firebase.database().ref('meetups').child(key).update({ imageUrl: imageUrl })
+                return fileData.ref.getDownloadURL()
+            })
+            .then(downloadUrl => {
+                imageUrl = downloadUrl
+                return firebase.database().ref('meetups').child(key).update({ imageUrl })
             })
             .then(() => {
                 commit('createMeetup', {
                     ...meetup,
-                    imageUrl: imageUrl,
+                    imageUrl,
                     id: key
                 })
             })
