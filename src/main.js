@@ -7,6 +7,7 @@ import colors from 'vuetify/es5/util/colors'
 import { store } from './store'
 import DateFilter from './filters/date'
 import AlertCmp from './components/shared/Alert.vue'
+import EditMeetupDetailsDialog from './components/meetup/edit/EditMeetupDetailsDialog'
 
 // Make firebase accessible from devtools console
 import * as firebase from 'firebase'
@@ -24,6 +25,7 @@ Vue.config.productionTip = false
 
 Vue.filter('date', DateFilter)
 Vue.component('app-alert', AlertCmp)
+Vue.component('app-edit-meetup-details-dialog', EditMeetupDetailsDialog)
 
 /* eslint-disable no-new */
 new Vue({
