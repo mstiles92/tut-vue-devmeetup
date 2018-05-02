@@ -230,6 +230,30 @@ const actions = {
                 console.log(error)
             })
     },
+    fetchUserData({commit, getters}) {
+        commit('setLoading', true)
+        firebase.database().ref(`/users/${getters.user.id}/registrations`).once('value')
+            .then(data => {
+                const dataPairs = data.val()
+                let registeredMeetups = []
+                let swappedPairs = {}
+                for (let key in dataPairs) {
+                    registeredMeetups.push(dataPairs[key])
+                    swappedPairs[dataPairs[key]] = key
+                }
+                const updatedUser = {
+                    id: getters.user.id,
+                    registeredMeetups: registeredMeetups,
+                    fbKeys: swappedPairs
+                }
+                commit('setLoading', false)
+                commit('setUser', updatedUser)
+            })
+            .catch(error => {
+                console.log(error)
+                commit('setLoading', false)
+            })
+    },
     logout() {
         firebase.auth().signOut()
     },
@@ -273,6 +297,7 @@ const plugins = [
                 registeredMeetups: [],
                 fbKeys: {}
             })
+            store.dispatch('fetchUserData')
         } else {
             store.commit('setUser', null)
         }
