@@ -10,6 +10,7 @@ import AlertCmp from './components/shared/Alert.vue'
 import EditMeetupDetailsDialog from './components/meetup/edit/EditMeetupDetailsDialog'
 import EditMeetupDateDialog from './components/meetup/edit/EditMeetupDateDialog'
 import EditMeetupTimeDialog from './components/meetup/edit/EditMeetupTimeDialog'
+import RegisterDialog from './components/meetup/registration/RegisterDialog'
 
 // Make firebase accessible from devtools console
 import * as firebase from 'firebase'
@@ -30,6 +31,7 @@ Vue.component('app-alert', AlertCmp)
 Vue.component('app-edit-meetup-details-dialog', EditMeetupDetailsDialog)
 Vue.component('app-edit-meetup-date-dialog', EditMeetupDateDialog)
 Vue.component('app-edit-meetup-time-dialog', EditMeetupTimeDialog)
+Vue.component('app-meetup-register-dialog', RegisterDialog)
 
 /* eslint-disable no-new */
 new Vue({
