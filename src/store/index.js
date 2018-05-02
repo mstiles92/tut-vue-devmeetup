@@ -144,7 +144,7 @@ const actions = {
             updateObj.description = payload.description
         }
         if (payload.date) {
-            updateObj.date = payload.date
+            updateObj.date = payload.date.toISOString()
         }
         firebase.database().ref('meetups').child(payload.id).update(updateObj)
             .then(() => {
