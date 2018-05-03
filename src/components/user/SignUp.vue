@@ -47,7 +47,6 @@
 
 <script>
     export default {
-        name: 'SignUp',
         data() {
             return {
                 email: '',
@@ -86,7 +85,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

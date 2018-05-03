@@ -75,8 +75,7 @@
             onLogout() {
                 this.$store.dispatch('logout')
             }
-        },
-        name: 'App'
+        }
     }
 </script>
 

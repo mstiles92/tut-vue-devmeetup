@@ -42,7 +42,6 @@
 
 <script>
     export default {
-        name: 'SignIn',
         data() {
             return {
                 email: '',
@@ -77,7 +76,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

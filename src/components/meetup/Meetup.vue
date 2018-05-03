@@ -42,7 +42,6 @@
 
 <script>
     export default {
-        name: 'Meetup',
         props: ['id'],
         computed: {
             meetup() {
@@ -64,7 +63,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

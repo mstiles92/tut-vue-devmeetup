@@ -7,7 +7,7 @@ const state = {
 const mutations = {
     registerUserForMeetup(state, payload) {
         const id = payload.id
-        if (state.user.registeredMeetups.findIndex(meetup => meetup.id === id) > 0) {
+        if (state.user.registeredMeetups.findIndex(meetup => meetup === id) > 0) {
             return
         }
         state.user.registeredMeetups.push(id)
@@ -15,7 +15,7 @@ const mutations = {
     },
     unregisterUserFromMeetup(state, payload) {
         const registeredMeetups = state.user.registeredMeetups
-        registeredMeetups.splice(registeredMeetups.findIndex(meetup => meetup.id === payload.id), 1)
+        registeredMeetups.splice(registeredMeetups.findIndex(meetup => meetup === payload.id), 1)
         Reflect.deleteProperty(state.user.fbKeys, payload)
     },
     setUser(state, payload) {
@@ -27,7 +27,7 @@ const actions = {
     registerUserForMeetup({commit, getters}, payload) {
         commit('setLoading', true)
         const user = getters.user
-        firebase.database().ref(`/users/${user.id}`).child('registrations')
+        firebase.database().ref(`/users/${user.id}/registrations`)
             .push(payload)
             .then(data => {
                 commit('setLoading', false)
@@ -48,7 +48,7 @@ const actions = {
             return
         }
         const fbKey = user.fbKeys[payload]
-        firebase.database().ref(`/users/${user.id}/registrations`).child(fbKey)
+        firebase.database().ref(`/users/${user.id}/registrations/${fbKey}`)
             .remove()
             .then(() => {
                 commit('setLoading', false)

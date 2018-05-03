@@ -6,7 +6,6 @@
 
 <script>
     export default {
-        name: 'Alert',
         props: [ 'text' ],
         methods: {
             onClose() {
@@ -15,7 +14,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

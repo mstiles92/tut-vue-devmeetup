@@ -1,25 +1,7 @@
-import * as moment from 'moment'
 import * as firebase from 'firebase'
 
 const state = {
-    loadedMeetups: [
-        {
-            imageUrl: 'https://i.ytimg.com/vi/MtCMtC50gwY/maxresdefault.jpg',
-            id: '0001',
-            title: 'New York Meetup',
-            date: moment('2017-07-17'),
-            location: 'New York',
-            description: 'New York, New York'
-        },
-        {
-            imageUrl: 'https://i.ytimg.com/vi/_FYKIhJZdaI/maxresdefault.jpg',
-            id: '0002',
-            title: 'Paris Meetup',
-            date: moment('2017-07-19'),
-            location: 'Paris',
-            description: 'Paris!'
-        }
-    ]
+    loadedMeetups: []
 }
 
 const mutations = {
@@ -30,9 +12,7 @@ const mutations = {
         state.loadedMeetups.push(payload)
     },
     updateMeetup(state, payload) {
-        const meetup = state.loadedMeetups.find(meetup => {
-            return meetup.id === payload.id
-        })
+        const meetup = state.loadedMeetups.find(meetup => meetup.id === payload.id)
         if (payload.title) {
             meetup.title = payload.title
         }

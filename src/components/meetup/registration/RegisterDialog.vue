@@ -1,5 +1,5 @@
 <template>
-    <v-dialog persistent v-model="registerDialog">
+    <v-dialog persistent v-model="registerDialog" max-width="500px">
         <v-btn color="primary" slot="activator">
             {{ userIsRegistered ? 'Unregister' : 'Register' }}
         </v-btn>
@@ -40,9 +40,7 @@
         props: ['meetupId'],
         computed: {
             userIsRegistered() {
-                return this.$store.getters.user.registeredMeetups.findIndex(meetupId => {
-                    return meetupId === this.meetupId
-                }) >= 0
+                return this.$store.getters.user.registeredMeetups.findIndex(meetupId => meetupId === this.meetupId) >= 0
             }
         },
         methods: {
@@ -56,7 +54,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

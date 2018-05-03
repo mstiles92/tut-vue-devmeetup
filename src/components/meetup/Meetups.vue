@@ -32,7 +32,6 @@
 
 <script>
     export default {
-        name: 'Meetups',
         computed: {
             meetups() {
                 return this.$store.getters.loadedMeetups
@@ -40,7 +39,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>
