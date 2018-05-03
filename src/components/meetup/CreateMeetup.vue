@@ -56,7 +56,12 @@
                     </v-layout>
                     <v-layout row>
                         <v-flex xs12 sm6 offset-sm3>
-                            <v-btn type="submit" class="primary" :disabled="!formIsValid">Create Meetup</v-btn>
+                            <v-btn type="submit" class="primary" :disabled="!formIsValid || loading" :loading="loading">
+                                Create Meetup
+                                <span slot="loader" class="custom-loader">
+                                    <v-icon light>cached</v-icon>
+                                </span>
+                            </v-btn>
                         </v-flex>
                     </v-layout>
                 </form>
@@ -86,6 +91,9 @@
             },
             submittableDateTime() {
                 return moment(this.date + ' ' + this.time, 'YYYY-MM-DD HH:mm')
+            },
+            loading() {
+                return this.$store.getters.loading
             }
         },
         methods: {
@@ -107,7 +115,9 @@
                 }
 
                 this.$store.dispatch('createMeetup', meetupData)
-                this.$router.push('/meetups')
+                    .then(id => {
+                        this.$router.push('/meetups/' + id)
+                    })
             },
             onPickFile() {
                 this.$refs.fileInput.click()

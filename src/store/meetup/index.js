@@ -52,44 +52,50 @@ const actions = {
             })
     },
     createMeetup({commit, getters}, payload) {
-        const meetup = {
-            title: payload.title,
-            location: payload.location,
-            description: payload.description,
-            date: payload.date.toISOString(),
-            creatorId: getters.user.id
-        }
+        commit('setLoading', true)
+        return new Promise((resolve, reject) => {
+            const meetup = {
+                title: payload.title,
+                location: payload.location,
+                description: payload.description,
+                date: payload.date.toISOString(),
+                creatorId: getters.user.id
+            }
 
-        let imageUrl
-        let key
+            let imageUrl
+            let key
 
-        firebase.database().ref('meetups').push(meetup)
-            .then(data => {
-                key = data.key
-                return key
-            })
-            .then(key => {
-                const filename = payload.image.name
-                const ext = filename.slice(filename.lastIndexOf('.') + 1)
-                return firebase.storage().ref(`meetups/${key}.${ext}`).put(payload.image)
-            })
-            .then(fileData => {
-                return fileData.ref.getDownloadURL()
-            })
-            .then(downloadUrl => {
-                imageUrl = downloadUrl
-                return firebase.database().ref('meetups').child(key).update({ imageUrl })
-            })
-            .then(() => {
-                commit('createMeetup', {
-                    ...meetup,
-                    imageUrl,
-                    id: key
+            firebase.database().ref('meetups').push(meetup)
+                .then(data => {
+                    key = data.key
+                    return key
                 })
-            })
-            .catch(error => {
-                console.log(error)
-            })
+                .then(key => {
+                    const filename = payload.image.name
+                    const ext = filename.slice(filename.lastIndexOf('.') + 1)
+                    return firebase.storage().ref(`meetups/${key}.${ext}`).put(payload.image)
+                })
+                .then(fileData => {
+                    return fileData.ref.getDownloadURL()
+                })
+                .then(downloadUrl => {
+                    imageUrl = downloadUrl
+                    return firebase.database().ref('meetups').child(key).update({ imageUrl })
+                })
+                .then(() => {
+                    commit('setLoading', false)
+                    commit('createMeetup', {
+                        ...meetup,
+                        imageUrl,
+                        id: key
+                    })
+                    resolve(key)
+                })
+                .catch(error => {
+                    commit('setLoading', false)
+                    reject(error)
+                })
+        })
     },
     updateMeetupData({commit}, payload) {
         commit('setLoading', true)
