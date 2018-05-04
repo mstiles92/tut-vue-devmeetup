@@ -19,6 +19,7 @@
                         <template v-if="userIsCreator">
                             <v-spacer></v-spacer>
                             <app-edit-meetup-details-dialog :meetup="meetup"></app-edit-meetup-details-dialog>
+                            <app-delete-meetup-dialog :meetup="meetup"></app-delete-meetup-dialog>
                         </template>
                     </v-card-title>
                     <v-card-media :src="meetup.imageUrl" height="400px"></v-card-media>

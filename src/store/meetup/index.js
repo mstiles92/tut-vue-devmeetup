@@ -22,6 +22,10 @@ const mutations = {
         if (payload.date) {
             meetup.date = payload.date
         }
+    },
+    deleteMeetup(state, payload) {
+        const index = state.loadedMeetups.findIndex(meetup => meetup.id === payload)
+        state.loadedMeetups.splice(index, 1)
     }
 }
 
@@ -92,6 +96,7 @@ const actions = {
                     resolve(key)
                 })
                 .catch(error => {
+                    console.log(error)
                     commit('setLoading', false)
                     reject(error)
                 })
@@ -113,6 +118,22 @@ const actions = {
             .then(() => {
                 commit('setLoading', false)
                 commit('updateMeetup', payload)
+            })
+            .catch(error => {
+                console.log(error)
+                commit('setLoading', false)
+            })
+    },
+    deleteMeetup({commit, getters}, payload) {
+        commit('setLoading', true)
+        firebase.database().ref(`/meetups/${payload}`).remove()
+            .then(() => {
+                const imageUrl = getters.loadedMeetup(payload).imageUrl
+                return firebase.storage().refFromURL(imageUrl).delete()
+            })
+            .then(() => {
+                commit('deleteMeetup', payload)
+                commit('setLoading', false)
             })
             .catch(error => {
                 console.log(error)
