@@ -161,4 +161,6 @@ const getters = {
     }
 }
 
-export default { state, mutations, actions, getters }
+const plugins = []
+
+export default { state, mutations, actions, getters, plugins }

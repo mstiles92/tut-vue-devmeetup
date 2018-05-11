@@ -5,25 +5,14 @@ import firebaseConfig from '../config'
 import meetup from './meetup'
 import user from './user'
 import shared from './shared'
-import { Mutations, Actions } from './definitions'
 
 Vue.use(Vuex)
 
 firebase.initializeApp(firebaseConfig)
 
 const plugins = [
-    store => firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            store.commit(Mutations.SET_USER, {
-                id: user.uid,
-                registeredMeetups: [],
-                fbKeys: {}
-            })
-            store.dispatch(Actions.FETCH_USER_DATA)
-        } else {
-            store.commit(Mutations.SET_USER, null)
-        }
-    })
+    ...meetup.plugins,
+    ...user.plugins
 ]
 
 export const store = new Vuex.Store({

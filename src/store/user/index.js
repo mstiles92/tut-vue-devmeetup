@@ -121,4 +121,19 @@ const getters = {
     }
 }
 
-export default { state, mutations, actions, getters }
+const plugins = [
+    store => firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            store.commit(Mutations.SET_USER, {
+                id: user.uid,
+                registeredMeetups: [],
+                fbKeys: {}
+            })
+            store.dispatch(Actions.FETCH_USER_DATA)
+        } else {
+            store.commit(Mutations.SET_USER, null)
+        }
+    })
+]
+
+export default { state, mutations, actions, getters, plugins }
