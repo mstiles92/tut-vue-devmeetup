@@ -1,17 +1,18 @@
 import * as firebase from 'firebase'
+import { Mutations, Actions } from '../definitions'
 
 const state = {
     loadedMeetups: []
 }
 
 const mutations = {
-    setLoadedMeetups(state, payload) {
+    [Mutations.SET_LOADED_MEETUPS](state, payload) {
         state.loadedMeetups = payload
     },
-    createMeetup(state, payload) {
+    [Mutations.CREATE_MEETUP](state, payload) {
         state.loadedMeetups.push(payload)
     },
-    updateMeetup(state, payload) {
+    [Mutations.UPDATE_MEETUP](state, payload) {
         const meetup = state.loadedMeetups.find(meetup => meetup.id === payload.id)
         if (payload.title) {
             meetup.title = payload.title
@@ -23,15 +24,15 @@ const mutations = {
             meetup.date = payload.date
         }
     },
-    deleteMeetup(state, payload) {
+    [Mutations.DELETE_MEETUP](state, payload) {
         const index = state.loadedMeetups.findIndex(meetup => meetup.id === payload)
         state.loadedMeetups.splice(index, 1)
     }
 }
 
 const actions = {
-    loadMeetups({commit}) {
-        commit('setLoading', true)
+    [Actions.LOAD_MEETUPS]({commit}) {
+        commit(Mutations.SET_LOADING, true)
         firebase.database().ref('meetups').once('value')
             .then(data => {
                 const meetups = []
@@ -47,16 +48,16 @@ const actions = {
                         creatorId: obj[key].creatorId
                     })
                 }
-                commit('setLoadedMeetups', meetups)
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADED_MEETUPS, meetups)
+                commit(Mutations.SET_LOADING, false)
             })
             .catch(error => {
                 console.log(error)
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADING, false)
             })
     },
-    createMeetup({commit, getters}, payload) {
-        commit('setLoading', true)
+    [Actions.CREATE_MEETUP]({commit, getters}, payload) {
+        commit(Mutations.SET_LOADING, true)
         return new Promise((resolve, reject) => {
             const meetup = {
                 title: payload.title,
@@ -87,8 +88,8 @@ const actions = {
                     return firebase.database().ref('meetups').child(key).update({ imageUrl })
                 })
                 .then(() => {
-                    commit('setLoading', false)
-                    commit('createMeetup', {
+                    commit(Mutations.SET_LOADING, false)
+                    commit(Mutations.CREATE_MEETUP, {
                         ...meetup,
                         imageUrl,
                         id: key
@@ -97,13 +98,13 @@ const actions = {
                 })
                 .catch(error => {
                     console.log(error)
-                    commit('setLoading', false)
+                    commit(Mutations.SET_LOADING, false)
                     reject(error)
                 })
         })
     },
-    updateMeetupData({commit}, payload) {
-        commit('setLoading', true)
+    [Actions.UPDATE_MEETUP]({commit}, payload) {
+        commit(Mutations.SET_LOADING, true)
         const updateObj = {}
         if (payload.title) {
             updateObj.title = payload.title
@@ -116,28 +117,28 @@ const actions = {
         }
         firebase.database().ref('meetups').child(payload.id).update(updateObj)
             .then(() => {
-                commit('setLoading', false)
-                commit('updateMeetup', payload)
+                commit(Mutations.SET_LOADING, false)
+                commit(Mutations.UPDATE_MEETUP, payload)
             })
             .catch(error => {
                 console.log(error)
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADING, false)
             })
     },
-    deleteMeetup({commit, getters}, payload) {
-        commit('setLoading', true)
+    [Actions.DELETE_MEETUP]({commit, getters}, payload) {
+        commit(Mutations.SET_LOADING, true)
         firebase.database().ref(`/meetups/${payload}`).remove()
             .then(() => {
                 const imageUrl = getters.loadedMeetup(payload).imageUrl
                 return firebase.storage().refFromURL(imageUrl).delete()
             })
             .then(() => {
-                commit('deleteMeetup', payload)
-                commit('setLoading', false)
+                commit(Mutations.DELETE_MEETUP, payload)
+                commit(Mutations.SET_LOADING, false)
             })
             .catch(error => {
                 console.log(error)
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADING, false)
             })
     }
 }

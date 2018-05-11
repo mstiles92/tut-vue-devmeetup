@@ -27,6 +27,8 @@
 </template>
 
 <script>
+    import { Actions } from '@/store/definitions'
+
     export default {
         data() {
             return {
@@ -36,7 +38,7 @@
         props: [ 'meetup' ],
         methods: {
             onDelete() {
-                this.$store.dispatch('deleteMeetup', this.meetup.id)
+                this.$store.dispatch(Actions.DELETE_MEETUP, this.meetup.id)
                 this.$router.push('/meetups')
             }
         }

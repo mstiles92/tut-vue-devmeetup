@@ -1,11 +1,12 @@
 import * as firebase from 'firebase'
+import { Mutations, Actions } from '../definitions'
 
 const state = {
     user: null
 }
 
 const mutations = {
-    registerUserForMeetup(state, payload) {
+    [Mutations.REGISTER_USER_FOR_MEETUP](state, payload) {
         const id = payload.id
         if (state.user.registeredMeetups.findIndex(meetup => meetup === id) > 0) {
             return
@@ -13,36 +14,36 @@ const mutations = {
         state.user.registeredMeetups.push(id)
         state.user.fbKeys[id] = payload.fbKey
     },
-    unregisterUserFromMeetup(state, payload) {
+    [Mutations.UNREGISTER_USER_FROM_MEETUP](state, payload) {
         const registeredMeetups = state.user.registeredMeetups
         registeredMeetups.splice(registeredMeetups.findIndex(meetup => meetup === payload.id), 1)
         Reflect.deleteProperty(state.user.fbKeys, payload)
     },
-    setUser(state, payload) {
+    [Mutations.SET_USER](state, payload) {
         state.user = payload
     }
 }
 
 const actions = {
-    registerUserForMeetup({commit, getters}, payload) {
-        commit('setLoading', true)
+    [Actions.REGISTER_USER_FOR_MEETUP]({commit, getters}, payload) {
+        commit(Mutations.SET_LOADING, true)
         const user = getters.user
         firebase.database().ref(`/users/${user.id}/registrations`)
             .push(payload)
             .then(data => {
-                commit('setLoading', false)
-                commit('registerUserForMeetup', {
+                commit(Mutations.SET_LOADING, false)
+                commit(Mutations.REGISTER_USER_FOR_MEETUP, {
                     id: payload,
                     fbKey: data.key
                 })
             })
             .catch(error => {
                 console.log(error)
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADING, false)
             })
     },
-    unregisterUserFromMeetup({commit, getters}, payload) {
-        commit('setLoading', true)
+    [Actions.UNREGISTER_USER_FROM_MEETUP]({commit, getters}, payload) {
+        commit(Mutations.SET_LOADING, true)
         const user = getters.user
         if (!user.fbKeys) {
             return
@@ -51,42 +52,42 @@ const actions = {
         firebase.database().ref(`/users/${user.id}/registrations/${fbKey}`)
             .remove()
             .then(() => {
-                commit('setLoading', false)
-                commit('unregisterUserFromMeetup', payload)
+                commit(Mutations.SET_LOADING, false)
+                commit(Mutations.UNREGISTER_USER_FROM_MEETUP, payload)
             })
             .catch(error => {
                 console.log(error)
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADING, false)
             })
     },
-    signUserUp({commit}, payload) {
-        commit('setLoading', true)
-        commit('clearError')
+    [Actions.SIGN_USER_UP]({commit}, payload) {
+        commit(Mutations.SET_LOADING, true)
+        commit(Mutations.CLEAR_ERROR)
         firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
             .then(() => {
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADING, false)
             })
             .catch(error => {
-                commit('setLoading', false)
-                commit('setError', error)
+                commit(Mutations.SET_LOADING, false)
+                commit(Mutations.SET_ERROR, error)
                 console.log(error)
             })
     },
-    signUserIn({commit}, payload) {
-        commit('setLoading', true)
-        commit('clearError')
+    [Actions.SIGN_USER_IN]({commit}, payload) {
+        commit(Mutations.SET_LOADING, true)
+        commit(Mutations.CLEAR_ERROR)
         firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
             .then(() => {
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADING, false)
             })
             .catch(error => {
-                commit('setLoading', false)
-                commit('setError', error)
+                commit(Mutations.SET_LOADING, false)
+                commit(Mutations.SET_ERROR, error)
                 console.log(error)
             })
     },
-    fetchUserData({commit, getters}) {
-        commit('setLoading', true)
+    [Actions.FETCH_USER_DATA]({commit, getters}) {
+        commit(Mutations.SET_LOADING, true)
         firebase.database().ref(`/users/${getters.user.id}/registrations`).once('value')
             .then(data => {
                 const dataPairs = data.val()
@@ -101,15 +102,15 @@ const actions = {
                     registeredMeetups: registeredMeetups,
                     fbKeys: swappedPairs
                 }
-                commit('setLoading', false)
-                commit('setUser', updatedUser)
+                commit(Mutations.SET_LOADING, false)
+                commit(Mutations.SET_USER, updatedUser)
             })
             .catch(error => {
                 console.log(error)
-                commit('setLoading', false)
+                commit(Mutations.SET_LOADING, false)
             })
     },
-    logout() {
+    [Actions.LOGOUT]() {
         firebase.auth().signOut()
     }
 }

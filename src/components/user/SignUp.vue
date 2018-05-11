@@ -46,6 +46,8 @@
 </template>
 
 <script>
+    import { Actions } from '@/store/definitions'
+
     export default {
         data() {
             return {
@@ -77,10 +79,10 @@
         },
         methods: {
             onSignup() {
-                this.$store.dispatch('signUserUp', { email: this.email, password: this.password })
+                this.$store.dispatch(Actions.SIGN_USER_UP, { email: this.email, password: this.password })
             },
             onDismissed() {
-                this.$store.dispatch('clearError')
+                this.$store.dispatch(Actions.CLEAR_ERROR)
             }
         }
     }

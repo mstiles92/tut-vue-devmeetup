@@ -72,6 +72,7 @@
 
 <script>
     import * as moment from 'moment'
+    import { Actions } from '@/store/definitions'
 
     export default {
         data() {
@@ -114,7 +115,7 @@
                     date: this.submittableDateTime
                 }
 
-                this.$store.dispatch('createMeetup', meetupData)
+                this.$store.dispatch(Actions.CREATE_MEETUP, meetupData)
                     .then(id => {
                         this.$router.push('/meetups/' + id)
                     })

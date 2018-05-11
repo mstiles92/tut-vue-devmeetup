@@ -41,6 +41,8 @@
 </template>
 
 <script>
+    import { Actions } from '@/store/definitions'
+
     export default {
         data() {
             return {
@@ -68,10 +70,10 @@
         },
         methods: {
             onSignin() {
-                this.$store.dispatch('signUserIn', { email: this.email, password: this.password })
+                this.$store.dispatch(Actions.SIGN_USER_IN, { email: this.email, password: this.password })
             },
             onDismissed() {
-                this.$store.dispatch('clearError')
+                this.$store.dispatch(Actions.CLEAR_ERROR)
             }
         }
     }

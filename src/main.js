@@ -12,6 +12,7 @@ import EditMeetupDateDialog from './components/meetup/edit/EditMeetupDateDialog'
 import EditMeetupTimeDialog from './components/meetup/edit/EditMeetupTimeDialog'
 import RegisterDialog from './components/meetup/registration/RegisterDialog'
 import DeleteMeetupDialog from './components/meetup/edit/DeleteMeetupDialog'
+import { Actions } from './store/definitions'
 
 // Make firebase accessible from devtools console
 import * as firebase from 'firebase'
@@ -42,6 +43,6 @@ new Vue({
     store,
     render: h => h(App),
     created() {
-        this.$store.dispatch('loadMeetups')
+        this.$store.dispatch(Actions.LOAD_MEETUPS)
     }
 })

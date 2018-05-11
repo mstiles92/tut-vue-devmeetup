@@ -42,6 +42,8 @@
 </template>
 
 <script>
+    import { Actions } from './store/definitions'
+
     export default {
         data() {
             return {
@@ -73,7 +75,7 @@
         },
         methods: {
             onLogout() {
-                this.$store.dispatch('logout')
+                this.$store.dispatch(Actions.LOGOUT)
             }
         }
     }

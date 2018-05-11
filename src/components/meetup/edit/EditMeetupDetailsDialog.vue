@@ -34,6 +34,8 @@
 </template>
 
 <script>
+    import { Actions } from '@/store/definitions'
+
     export default {
         data() {
             return {
@@ -49,7 +51,7 @@
                     return
                 }
                 this.editDialog = false
-                this.$store.dispatch('updateMeetupData', {
+                this.$store.dispatch(Actions.UPDATE_MEETUP, {
                     id: this.meetup.id,
                     title: this.editedTitle,
                     description: this.editedDescription

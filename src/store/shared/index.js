@@ -1,23 +1,25 @@
+import { Mutations, Actions } from '../definitions'
+
 const state = {
     loading: false,
     error: null
 }
 
 const mutations = {
-    setLoading(state, payload) {
+    [Mutations.SET_LOADING](state, payload) {
         state.loading = payload
     },
-    setError(state, payload) {
+    [Mutations.SET_ERROR](state, payload) {
         state.error = payload
     },
-    clearError(state) {
+    [Mutations.CLEAR_ERROR](state) {
         state.error = null
     }
 }
 
 const actions = {
-    clearError({commit}) {
-        commit('clearError')
+    [Actions.CLEAR_ERROR]({commit}) {
+        commit(Mutations.CLEAR_ERROR)
     }
 }
 

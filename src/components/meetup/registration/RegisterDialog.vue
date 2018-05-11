@@ -31,6 +31,8 @@
 </template>
 
 <script>
+    import { Actions } from '@/store/definitions'
+
     export default {
         data() {
             return {
@@ -46,9 +48,9 @@
         methods: {
             onAgree() {
                 if (this.userIsRegistered) {
-                    this.$store.dispatch('unregisterUserFromMeetup', this.meetupId)
+                    this.$store.dispatch(Actions.UNREGISTER_USER_FROM_MEETUP, this.meetupId)
                 } else {
-                    this.$store.dispatch('registerUserForMeetup', this.meetupId)
+                    this.$store.dispatch(Actions.REGISTER_USER_FOR_MEETUP, this.meetupId)
                 }
             }
         }

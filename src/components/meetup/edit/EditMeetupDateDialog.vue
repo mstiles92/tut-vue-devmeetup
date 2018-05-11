@@ -28,6 +28,7 @@
 
 <script>
     import * as moment from 'moment'
+    import { Actions } from '@/store/definitions'
 
     export default {
         data() {
@@ -44,7 +45,7 @@
                 newDate.date(newDatePicked.date())
                 newDate.month(newDatePicked.month())
                 newDate.year(newDatePicked.year())
-                this.$store.dispatch('updateMeetupData', {
+                this.$store.dispatch(Actions.UPDATE_MEETUP, {
                     id: this.meetup.id,
                     date: newDate
                 })
