@@ -8,54 +8,10 @@ const state = {
 const mutations = {
     [Mutations.SET_LOADED_MEETUPS](state, payload) {
         state.loadedMeetups = payload
-    },
-    [Mutations.CREATE_MEETUP](state, payload) {
-        state.loadedMeetups.push(payload)
-    },
-    [Mutations.UPDATE_MEETUP](state, payload) {
-        const meetup = state.loadedMeetups.find(meetup => meetup.id === payload.id)
-        if (payload.title) {
-            meetup.title = payload.title
-        }
-        if (payload.description) {
-            meetup.description = payload.description
-        }
-        if (payload.date) {
-            meetup.date = payload.date
-        }
-    },
-    [Mutations.DELETE_MEETUP](state, payload) {
-        const index = state.loadedMeetups.findIndex(meetup => meetup.id === payload)
-        state.loadedMeetups.splice(index, 1)
     }
 }
 
 const actions = {
-    [Actions.LOAD_MEETUPS]({commit}) {
-        commit(Mutations.SET_LOADING, true)
-        firebase.database().ref('meetups').once('value')
-            .then(data => {
-                const meetups = []
-                const obj = data.val()
-                for (let key in obj) {
-                    meetups.push({
-                        id: key,
-                        title: obj[key].title,
-                        description: obj[key].description,
-                        imageUrl: obj[key].imageUrl,
-                        date: obj[key].date,
-                        location: obj[key].location,
-                        creatorId: obj[key].creatorId
-                    })
-                }
-                commit(Mutations.SET_LOADED_MEETUPS, meetups)
-                commit(Mutations.SET_LOADING, false)
-            })
-            .catch(error => {
-                console.log(error)
-                commit(Mutations.SET_LOADING, false)
-            })
-    },
     [Actions.CREATE_MEETUP]({commit, getters}, payload) {
         commit(Mutations.SET_LOADING, true)
         return new Promise((resolve, reject) => {
@@ -89,11 +45,6 @@ const actions = {
                 })
                 .then(() => {
                     commit(Mutations.SET_LOADING, false)
-                    commit(Mutations.CREATE_MEETUP, {
-                        ...meetup,
-                        imageUrl,
-                        id: key
-                    })
                     resolve(key)
                 })
                 .catch(error => {
@@ -118,7 +69,6 @@ const actions = {
         firebase.database().ref('meetups').child(payload.id).update(updateObj)
             .then(() => {
                 commit(Mutations.SET_LOADING, false)
-                commit(Mutations.UPDATE_MEETUP, payload)
             })
             .catch(error => {
                 console.log(error)
@@ -127,13 +77,12 @@ const actions = {
     },
     [Actions.DELETE_MEETUP]({commit, getters}, payload) {
         commit(Mutations.SET_LOADING, true)
+        const imageUrl = getters.loadedMeetup(payload).imageUrl
         firebase.database().ref(`/meetups/${payload}`).remove()
             .then(() => {
-                const imageUrl = getters.loadedMeetup(payload).imageUrl
                 return firebase.storage().refFromURL(imageUrl).delete()
             })
             .then(() => {
-                commit(Mutations.DELETE_MEETUP, payload)
                 commit(Mutations.SET_LOADING, false)
             })
             .catch(error => {
@@ -145,9 +94,7 @@ const actions = {
 
 const getters = {
     loadedMeetups(state) {
-        return state.loadedMeetups.sort((meetupA, meetupB) => {
-            return meetupA.date > meetupB.date
-        })
+        return state.loadedMeetups
     },
     featuredMeetups(state, getters) {
         return getters.loadedMeetups.slice(0, 5)
@@ -161,6 +108,23 @@ const getters = {
     }
 }
 
-const plugins = []
+const plugins = [
+    store => firebase.database().ref('meetups').orderByChild('date').on('value', snapshot => {
+        const meetups = []
+        snapshot.forEach(childSnapshot => {
+            const obj = childSnapshot.val()
+            meetups.push({
+                id: childSnapshot.key,
+                title: obj.title,
+                description: obj.description,
+                imageUrl: obj.imageUrl,
+                date: obj.date,
+                location: obj.location,
+                creatorId: obj.creatorId
+            })
+        })
+        store.commit(Mutations.SET_LOADED_MEETUPS, meetups)
+    })
+]
 
 export default { state, mutations, actions, getters, plugins }
