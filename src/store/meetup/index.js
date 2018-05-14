@@ -20,7 +20,8 @@ const actions = {
                 location: payload.location,
                 description: payload.description,
                 date: payload.date.toISOString(),
-                creatorId: getters.user.id
+                creatorId: getters.user.id,
+                creatorName: getters.user.email
             }
 
             let imageUrl
@@ -120,7 +121,8 @@ const plugins = [
                 imageUrl: obj.imageUrl,
                 date: obj.date,
                 location: obj.location,
-                creatorId: obj.creatorId
+                creatorId: obj.creatorId,
+                creatorName: obj.creatorName
             })
         })
         store.commit(Mutations.SET_LOADED_MEETUPS, meetups)

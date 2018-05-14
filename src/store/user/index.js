@@ -89,6 +89,7 @@ const plugins = [
         if (newUser) {
             store.commit(Mutations.SET_USER, {
                 id: newUser.uid,
+                email: newUser.email,
                 registeredMeetups: []
             })
             firebase.database().ref(`/users/${newUser.uid}/registrations`).on('value', snapshot => {

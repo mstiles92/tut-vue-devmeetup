@@ -16,6 +16,10 @@
                 <v-card>
                     <v-card-title>
                         <h1 class="primary--text">{{ meetup.title }}</h1>
+                        <template v-if="userIsRegistered">
+                            <v-spacer></v-spacer>
+                            <h1 class="accent--text">Registered!</h1>
+                        </template>
                         <template v-if="userIsCreator">
                             <v-spacer></v-spacer>
                             <app-edit-meetup-details-dialog :meetup="meetup"></app-edit-meetup-details-dialog>
@@ -25,6 +29,7 @@
                     <v-card-media :src="meetup.imageUrl" height="400px"></v-card-media>
                     <v-card-text>
                         <div class="info--text">{{ meetup.date | date }} - {{ meetup.location }}</div>
+                        <div class="info--text">Organized by {{ meetup.creatorName }}</div>
                         <div>
                             <app-edit-meetup-date-dialog :meetup="meetup" v-if="userIsCreator"></app-edit-meetup-date-dialog>
                             <app-edit-meetup-time-dialog :meetup="meetup" v-if="userIsCreator"></app-edit-meetup-time-dialog>
@@ -52,11 +57,10 @@
                 return this.$store.getters.user !== null && this.$store.getters.user !== undefined
             },
             userIsCreator() {
-                if (!this.userIsAuthenticated) {
-                    return false
-                }
-
-                return this.$store.getters.user.id === this.meetup.creatorId
+                return this.userIsAuthenticated && this.$store.getters.user.id === this.meetup.creatorId
+            },
+            userIsRegistered() {
+                return this.userIsAuthenticated && this.$store.getters.user.registeredMeetups.includes(this.meetup.id)
             },
             loading() {
                 return this.$store.getters.loading
