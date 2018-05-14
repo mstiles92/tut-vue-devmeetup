@@ -6,21 +6,13 @@ const state = {
 }
 
 const mutations = {
-    [Mutations.REGISTER_USER_FOR_MEETUP](state, payload) {
-        const id = payload.id
-        if (state.user.registeredMeetups.findIndex(meetup => meetup === id) > 0) {
-            return
-        }
-        state.user.registeredMeetups.push(id)
-        state.user.fbKeys[id] = payload.fbKey
-    },
-    [Mutations.UNREGISTER_USER_FROM_MEETUP](state, payload) {
-        const registeredMeetups = state.user.registeredMeetups
-        registeredMeetups.splice(registeredMeetups.findIndex(meetup => meetup === payload.id), 1)
-        Reflect.deleteProperty(state.user.fbKeys, payload)
-    },
     [Mutations.SET_USER](state, payload) {
         state.user = payload
+    },
+    [Mutations.SET_USER_REGISTRATIONS](state, payload) {
+        if (state.user) {
+            state.user.registeredMeetups = payload
+        }
     }
 }
 
@@ -28,14 +20,10 @@ const actions = {
     [Actions.REGISTER_USER_FOR_MEETUP]({commit, getters}, payload) {
         commit(Mutations.SET_LOADING, true)
         const user = getters.user
-        firebase.database().ref(`/users/${user.id}/registrations`)
-            .push(payload)
-            .then(data => {
+        firebase.database().ref(`/users/${user.id}/registrations/${payload}`)
+            .set(true)
+            .then(() => {
                 commit(Mutations.SET_LOADING, false)
-                commit(Mutations.REGISTER_USER_FOR_MEETUP, {
-                    id: payload,
-                    fbKey: data.key
-                })
             })
             .catch(error => {
                 console.log(error)
@@ -45,15 +33,10 @@ const actions = {
     [Actions.UNREGISTER_USER_FROM_MEETUP]({commit, getters}, payload) {
         commit(Mutations.SET_LOADING, true)
         const user = getters.user
-        if (!user.fbKeys) {
-            return
-        }
-        const fbKey = user.fbKeys[payload]
-        firebase.database().ref(`/users/${user.id}/registrations/${fbKey}`)
+        firebase.database().ref(`/users/${user.id}/registrations/${payload}`)
             .remove()
             .then(() => {
                 commit(Mutations.SET_LOADING, false)
-                commit(Mutations.UNREGISTER_USER_FROM_MEETUP, payload)
             })
             .catch(error => {
                 console.log(error)
@@ -86,30 +69,6 @@ const actions = {
                 console.log(error)
             })
     },
-    [Actions.FETCH_USER_DATA]({commit, getters}) {
-        commit(Mutations.SET_LOADING, true)
-        firebase.database().ref(`/users/${getters.user.id}/registrations`).once('value')
-            .then(data => {
-                const dataPairs = data.val()
-                let registeredMeetups = []
-                let swappedPairs = {}
-                for (let key in dataPairs) {
-                    registeredMeetups.push(dataPairs[key])
-                    swappedPairs[dataPairs[key]] = key
-                }
-                const updatedUser = {
-                    id: getters.user.id,
-                    registeredMeetups: registeredMeetups,
-                    fbKeys: swappedPairs
-                }
-                commit(Mutations.SET_LOADING, false)
-                commit(Mutations.SET_USER, updatedUser)
-            })
-            .catch(error => {
-                console.log(error)
-                commit(Mutations.SET_LOADING, false)
-            })
-    },
     [Actions.LOGOUT]() {
         firebase.auth().signOut()
     }
@@ -122,14 +81,23 @@ const getters = {
 }
 
 const plugins = [
-    store => firebase.auth().onAuthStateChanged(user => {
-        if (user) {
+    store => firebase.auth().onAuthStateChanged(newUser => {
+        const oldUser = store.getters.user
+        if (oldUser) {
+            firebase.database().ref(`/users/${oldUser.id}/registrations`).off()
+        }
+        if (newUser) {
             store.commit(Mutations.SET_USER, {
-                id: user.uid,
-                registeredMeetups: [],
-                fbKeys: {}
+                id: newUser.uid,
+                registeredMeetups: []
             })
-            store.dispatch(Actions.FETCH_USER_DATA)
+            firebase.database().ref(`/users/${newUser.uid}/registrations`).on('value', snapshot => {
+                if (snapshot.exists()) {
+                    store.commit(Mutations.SET_USER_REGISTRATIONS, Object.keys(snapshot.val()))
+                } else {
+                    store.commit(Mutations.SET_USER_REGISTRATIONS, [])
+                }
+            })
         } else {
             store.commit(Mutations.SET_USER, null)
         }
